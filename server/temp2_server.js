@@ -41,19 +41,19 @@ io.on('connection', socket => {
 
   socket.on('startDrawing', (data) => {
     console.log(data);
-    socket.to(data.mySessionId).emit('startDrawing', data);  
-    // socket.broadcast.emit('startDrawing', data);  // Broadcast 'startDrawing' event
+    // socket.to(data.mySessionId).emit('startDrawing', data);  
+    socket.broadcast.emit('startDrawing', data);  // Broadcast 'startDrawing' event
   });
 
   socket.on('drawing', (data) => {
     console.log(data);
-    // socket.broadcast.emit('drawing', data);
-    socket.to(data.mySessionId).emit('drawing', data);
+    socket.broadcast.emit('drawing', data);
+    // socket.to(data.mySessionId).emit('drawing', data);
   });
 
   socket.on('endDrawing', (data) => {
-    // socket.broadcast.emit('endDrawing', data);
-    socket.to(data.mySessionId).emit('endDrawing', data);
+    socket.broadcast.emit('endDrawing', data);
+    // socket.to(data.mySessionId).emit('endDrawing', data);
   });
 
   socket.on('disconnect', () => {

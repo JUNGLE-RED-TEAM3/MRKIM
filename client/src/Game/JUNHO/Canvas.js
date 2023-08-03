@@ -33,6 +33,10 @@ export function Canvas() {
     if (socketRef.current) {
       socketRef.current.on('drawing', (data) => {
           console.log(data);
+          // const { offsetX, offsetY, mySessionId } = data;
+          // const context = canvasRef.current.getContext("2d");
+          // context.lineTo(offsetX, offsetY);
+          // context.stroke();
       });
     }
   }, [socketRef]);  // NOTE: socketRef를 dependency로 추가

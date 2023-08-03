@@ -16,29 +16,35 @@ export const CanvasProvider = ({ children, mySessionId, myUserName }) => {
 
 
   //서버 연결부분
+  socketRef.current = io.connect('https://mysquidcanvas.shop');
+
+  socketRef.current.emit('joinRoom', { mySessionId, myUserName });  // Emit 'joinRoom' event
 
   useEffect(() => {
-
-    socketRef.current = io.connect('https://mysquidcanvas.shop');
-
+    
     socketRef.current.on('startDrawing', data => {  // Listen for 'startDrawing' events
-      console.log('$$$$$client startDrawing: ', data);
-      const { offsetX, offsetY, lineWidth, strokeColor } = data;
-      contextRef.current.strokeStyle = strokeColor;  // Update stroke color
-      contextRef.current.lineWidth = lineWidth;  // Update line width
-      contextRef.current.beginPath();
-      contextRef.current.moveTo(offsetX, offsetY);
+      try {
+        console.log('$$$$$client startDrawing: ', data);
+        const { offsetX, offsetY, lineWidth, strokeColor, mySessionId } = data;
+        contextRef.current.strokeStyle = strokeColor;  // Update stroke color
+        contextRef.current.lineWidth = lineWidth;  // Update line width
+        contextRef.current.beginPath();
+        contextRef.current.moveTo(offsetX, offsetY);
+      } catch(err) {
+        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',err);
+      }
     });
   
     socketRef.current.on('drawing', data => {
       console.log('$$$$$client Drawing: ', data);
-      const { offsetX, offsetY } = data;
+      const { offsetX, offsetY, mySessionId } = data;
       contextRef.current.lineTo(offsetX, offsetY);
       contextRef.current.stroke();
     });
   
     socketRef.current.on('endDrawing', (data) => {
       console.log('$$$$client endDrawing: ', data);
+      const { mySessionId } = data;
       contextRef.current.closePath();
       setIsDrawing(false);
     });
@@ -50,6 +56,7 @@ export const CanvasProvider = ({ children, mySessionId, myUserName }) => {
       context.fillRect(0, 0, canvas.width, canvas.height)
     });
   }, []);
+
 
 
 
