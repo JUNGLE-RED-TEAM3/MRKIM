@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import './Webcam.css';
 import axios from 'axios';
 
+// YEONGWOO: provider 생성
+import SessionContext from './SessionContext';
+
 // OpenVidu
 import { OpenVidu } from 'openvidu-browser';
 import UserVideoComponent from './UserVideoComponent';
@@ -27,13 +30,16 @@ const Webcam = () => {
   const [subscribers, setSubscribers] = useState([]);
 
   useEffect(() => {
-
     window.addEventListener('beforeunload', onBeforeUnload);
-
+    
     return () => {
       window.removeEventListener('beforeunload', onBeforeUnload);
     };
   }, []);
+
+  useEffect(() => {
+    console.log('@@@@@@@@@@@@@@@@@@@@@@@Username: ', myUserName);
+  }, [myUserName]);
 
   const onBeforeUnload = (event) => {
     leaveSession();
@@ -55,21 +61,16 @@ const Webcam = () => {
     const mySession = OV.initSession();
 
     mySession.on('streamCreated', (event) => {
-      var subscriber = mySession.subscribe(event.stream, undefined); 
+      var subscriber = mySession.subscribe(event.stream, undefined);
       // mySession.subscribe : openvidu 세션(mySession)에 대해 스트림 구독
-     
-      var subscribers = [...subscribers];
-
-      const addSubscriber = (subscriber, subscribers) => {
-        subscribers.push(subscriber);
-        useStore.getState().setGamers({
-          name: JSON.parse(event.stream.connection.data).clientData,
-          streamManager: subscriber,
-        });
-        return subscribers;
-      };
-      
-      setSubscribers(addSubscriber(subscriber, subscribers));
+      // MRSEO: SUBSCRIBER 로직 업데이트
+      // var subscribers = [...subscribers];
+      useStore.getState().setGamers({
+        name: JSON.parse(event.stream.connection.data).clientData,
+        streamManager: subscriber,
+      });
+      subscribers.push(subscriber);
+      setSubscribers(subscribers);
     });
 
     mySession.on("streamDestroyed", (event) => {
@@ -245,7 +246,10 @@ const Webcam = () => {
 
                     </div>
                       {/* JANG: 게임 대기방 */}
-                      <GamePlay />
+                      <SessionContext.Provider value={{ mySessionId, myUserName }}>
+                        <GamePlay />
+                      </SessionContext.Provider>
+                      
                     </div>
                     ) : null }
 
@@ -257,7 +261,6 @@ const Webcam = () => {
                             useStore.getState().gameStart -> true이면, 캔버스 lokc 풀기 + 게임 시작
                         */}
                         <div className="GameForm_Content">
-                            <GamePlay />
                         </div>
                     </div>
                 ):null}
@@ -270,10 +273,11 @@ const Webcam = () => {
                     <>
                     {/* 게임 끝났을 때 */}
                     </>
-
+                
     </div>
 
     )
+
 }
 
 export default Webcam;

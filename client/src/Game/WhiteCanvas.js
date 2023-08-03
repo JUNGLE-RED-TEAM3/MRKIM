@@ -1,12 +1,17 @@
+import React, { useContext } from "react";
 import "./WhiteCanvas.css";
 import GameCanvas from './JUNHO/GameCanvas';
 import { CanvasProvider } from "./JUNHO/CanvasContext";
 
-function WhiteCanvas() {
+// YEONGWOO: context 추가
+import SessionContext from "../Openvidu/SessionContext";
 
+function WhiteCanvas() {
+    const { mySessionId, myUserName } = useContext(SessionContext);
+    console.log('##################################mySessionId: ', mySessionId, myUserName);
     return(
         <div className="GameCanvas">
-            <CanvasProvider>
+            <CanvasProvider mySessionId = { mySessionId } myUserName = {myUserName}>
                 <GameCanvas />
             </CanvasProvider>
         </div>
